@@ -3,8 +3,7 @@ import {createStackNavigator} from '@react-navigation/stack'
 
 import LoginScreen from '../screen/LoginScreen'
 import SignUpScreen from '../screen/SignUpScreen'
-import { Button } from 'react-native';
-
+import SignUpDetailScreen from '../screen/SignUpDetailScreen'
 const AuthStack = createStackNavigator();
 const LoginStack = createStackNavigator();
 
@@ -22,6 +21,7 @@ export default function AuthStackNavigator(){
           )}
         </AuthStack.Screen>
         <AuthStack.Screen name={'SignUp'} component={SignUpScreen} options={headerOptions}/>
+        <AuthStack.Screen name={'SignUpDetail'} component={SignUpDetailScreen} options={headerOptions}/>
     </AuthStack.Navigator>
   )
 }

@@ -8,59 +8,35 @@ import TextButton from '../component/TextButton'
 import Error from '../component/Error'
 import { NavigationContainer } from '@react-navigation/native';
 import { AuthContext } from '../contexts/AuthContext';
+import { UserContext } from '../contexts/UserContext';
 import Loading from '../component/Loading'
 
 //<TextButton title={"Back"} style={styles.closeButton} onPress={() => {navigation.pop()}}/>
 
-export default function SignUpScreen({navigation}){
-    const { check_account } = React.useContext(AuthContext);
-    const [email, setEmail] = React.useState('');
-    const [password, setPassword] = React.useState('');
-    const [confirmPassword, setConfirmPassword] = React.useState('');
+export default function SettingScreen({navigation}){
+
+    const { logout} = React.useContext(AuthContext);
+    const user = React.useContext(UserContext);
     const [loading, setLoading] = React.useState(false);
     const [err, setErr] = React.useState('');
     return (
         <View style={styles.title_container}>
-            <Heading style={styles.title}>Sign Up</Heading>
+            <Heading style={styles.title}>Setting</Heading>
             <Error error={err}/>
-            <Input style={styles.input} placeholder={'Email'} keyboardType={'email-address'}
-            value={email}
-            onChangeText={setEmail}/>
-            <Input style={styles.input} placeholder={'Password'} secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-            />
-            <Input style={styles.input} placeholder={'Confirm Password'} secureTextEntry
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-            />
+            <Text>Hello {user != null ? JSON.parse(user).userId : "null"}</Text>
             <FilledButton title={
-                "Sign Up"
-            } 
+                "Logout"
+            }
+
             style={styles.loginButton} 
             onPress={async () => {
                 try {
-                    setLoading(true);
-                    let resp = await check_account(email, password)
-                    
-                    setLoading(false)
-                    if (resp == true){
-                        // change screen here
-                        if (confirmPassword != password){
-                            setErr("Your password does not match your confirmed password")
-                        }else {
-                            navigation.navigate('SignUpDetail', {email: email, password: password})
-                        }
-                    }else {
-                        console.log(fail)
-                    }
+                    await logout()
                 }catch(err){
                     
                     console.log(err.response.data.errors[0].message)
                     setErr(err.response.data.errors[0].message);
-                    setLoading(false)
                 }
-                setLoading(false)
             }
             
             }> </FilledButton>
