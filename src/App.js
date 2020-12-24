@@ -10,7 +10,6 @@ import {AuthContext} from './contexts/AuthContext';
 import {UserContext} from './contexts/UserContext';
 import useAuth from './hooks/useAuth'
 
-import sleep from './utils/sleep';
 
 
 
@@ -22,8 +21,7 @@ export default function App(){
   // const [token, setToken] = React.useState(null);
   // const [user_type, setUserType] = React.useState(null);
   // const [userId, setUserId] = React.useState(null);
-  const [loading, setLoading] = React.useState(false);
-  const {auth, user} = useAuth();
+  const {auth, user, loading} = useAuth();
 
   
 

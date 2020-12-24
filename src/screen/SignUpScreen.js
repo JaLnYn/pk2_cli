@@ -1,4 +1,4 @@
-import {View, StyleSheet, Text} from 'react-native';
+import {KeyboardAvoidingView, View, StyleSheet, Text} from 'react-native';
 import * as React from 'react'
 import default_styles from '../style/default_styles'
 import Heading from '../component/Heading'
@@ -56,8 +56,8 @@ export default function SignUpScreen({navigation}){
                     }
                 }catch(err){
                     
-                    console.log(err.response.data.errors[0].message)
-                    setErr(err.response.data.errors[0].message);
+                    console.log(err.message)
+                    setErr(err.message);
                     setLoading(false)
                 }
                 setLoading(false)
@@ -66,6 +66,7 @@ export default function SignUpScreen({navigation}){
             }> </FilledButton>
 
             <Loading loading={loading}/>
+            <View style={{flex: 1}}/>
         </View>
     )
 }
@@ -75,6 +76,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingTop:120,
         alignItems: 'center',
+        justifyContent: 'flex-end',
         padding: 20
     },
     title: {

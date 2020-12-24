@@ -1,4 +1,4 @@
-import {View, StyleSheet, Text} from 'react-native';
+import {KeyboardAvoidingView, StyleSheet, Text, View} from 'react-native';
 import * as React from 'react'
 import default_styles from '../style/default_styles'
 import Heading from '../component/Heading'
@@ -40,8 +40,8 @@ export default function LoginScreen({navigation}){
                         await login(email, password)
 
                     }catch(err){
-                        console.log(err.response.data.errors[0].message)
-                        setErr(err.response.data.errors[0].message);
+                        console.log(err)
+                        setErr(err);
                     }
                     setLoading(false)
                 }}
@@ -50,6 +50,7 @@ export default function LoginScreen({navigation}){
                 navigation.navigate('SignUp')
             }}/>
             <Loading loading={loading}/>
+            <View style={{flex: 1}}/>
 
         </View>
     )
@@ -60,7 +61,8 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingTop:120,
         alignItems: 'center',
-        padding: 20
+        padding: 20,
+        justifyContent: 'flex-end',
     },
     title: {
         marginBottom:16

@@ -30,7 +30,7 @@ export default function SignUpDetailScreen({route, navigation}){
     const [userType, setUserType] = React.useState('T');
     // console.log(route.params.email, route.params.password)
     return (
-        <View style={styles.title_container}>
+        < View style={styles.title_container} >
             <Heading>Sign Up</Heading>
             <Error error={err}/>
             <LabeledInput style={styles.input} placeholder={'First Name'}
@@ -72,12 +72,10 @@ export default function SignUpDetailScreen({route, navigation}){
 
             style={styles.loginButton} 
             onPress={async () => {
-                console.log(userType, gender);
                 
                 try {
                     setLoading(true);
                     let resp = await signup(route.params.email, route.params.password, fname, lname,gender, userType, date)
-                    console.log(resp)
                     if (resp.signup != null){
 
                         setLoading(false)
@@ -100,8 +98,8 @@ export default function SignUpDetailScreen({route, navigation}){
                     // }
                 }catch(err){
                     
-                    console.log(err.response.data.errors[0].message)
-                    setErr(err.response.data.errors[0].message);
+                    console.log(err)
+                    setErr(err);
                 }
                 setLoading(false)
 
@@ -111,16 +109,23 @@ export default function SignUpDetailScreen({route, navigation}){
             }> </FilledButton>
 
             <Loading loading={loading}/>
-        </View>
+        </ View>
     )
 }
 
 const styles = StyleSheet.create({
+    keyboardAvoid:{
+        alignItems: 'center',
+        
+    },
     title_container: {
+
         flex: 1,
         paddingTop:120,
         alignItems: 'center',
+        justifyContent: 'flex-start',
         padding: 20
+
     },
     title: {
         marginBottom:16
