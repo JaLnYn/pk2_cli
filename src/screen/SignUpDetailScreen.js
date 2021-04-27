@@ -29,6 +29,31 @@ export default function SignUpDetailScreen({route, navigation}){
     const [gender, setGender] = React.useState('M');
     const [userType, setUserType] = React.useState('T');
     // console.log(route.params.email, route.params.password)
+
+    async function onSubmit(){
+                
+        try {
+            setLoading(true);
+            console.log(userType)
+            let resp = await signup(route.params.email.toLowerCase(), route.params.password, fname, lname,gender, userType, date)
+            if (resp.signup != null){
+                setLoading(false)
+                navigation.navigate("Login")
+                return
+            }else {
+                setErr("something went wrong. Please try again")
+            }
+
+        }catch(err){
+            
+            console.log(err)
+            setErr(err);
+        }
+        setLoading(false)
+
+        
+    }
+
     return (
         < View style={styles.title_container} >
             <Heading>Sign Up</Heading>
@@ -71,42 +96,8 @@ export default function SignUpDetailScreen({route, navigation}){
             } 
 
             style={styles.loginButton} 
-            onPress={async () => {
-                
-                try {
-                    setLoading(true);
-                    let resp = await signup(route.params.email, route.params.password, fname, lname,gender, userType, date)
-                    if (resp.signup != null){
-
-                        setLoading(false)
-                        navigation.navigate("Login")
-                        return
-                    }else {
-                        setErr("something went wrong. Please try again")
-                    }
-  
-                    
-                    // if (resp == true){
-                    //     // change screen here
-                    //     if (confirmPassword != password){
-                    //         setErr("Your password does not match your confirmed password")
-                    //     }else {
-                    //         navigation.navigate('SignUpDetail', {email: email, password: password})
-                    //     }
-                    // }else {
-                    //     console.log(fail)
-                    // }
-                }catch(err){
-                    
-                    console.log(err)
-                    setErr(err);
-                }
-                setLoading(false)
-
-                
-            }
-            
-            }> </FilledButton>
+            onPress={onSubmit}> 
+            </FilledButton>
 
             <Loading loading={loading}/>
         </ View>

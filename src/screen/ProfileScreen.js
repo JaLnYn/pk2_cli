@@ -36,6 +36,31 @@ export default function ProfileScreen({route, navigation}){
     const [pic, setPic] = React.useState(''); 
     const [changes, setChanges] = React.useState(false)
 
+    function headerLeftFunc(props){
+        return (
+                changes == true?  (
+                        <TextButton style={styles.topLeftButton} title={"cancel"} onPress={cancel_me}/>
+                    ) : (<View/>)
+            )
+    }
+
+    function headerRightFunc(props){
+        return (
+                
+            changes == true?  (
+                <TextButton style={styles.topRightButton} title={"save"} onPress={save_me}/>
+            ) : (<View/>)
+        
+        )
+    }
+
+    React.useLayoutEffect(() => {
+        navigation.setOptions({
+            headerLeft: headerLeftFunc,
+            headerRight: headerRightFunc
+        });
+    }, [navigation, bio, user_type, changes]);
+
     async function save_me(){
         console.log("saving...")
         setLoading(true)
@@ -90,9 +115,11 @@ export default function ProfileScreen({route, navigation}){
     }
 
     function on_tap_pic(){
-        navigation.navigate('ImgScreen', {
-            from_screen: "MainScreen",
+        navigation.navigate('ProfileImageSelect', {
+            from_screen: "ProfileScreen",
             current_pic: global.img_ad + '?img_loc=' + pic,
+            cmd: 'pp',
+            args: 'none'
         })
     }
 
@@ -110,7 +137,6 @@ export default function ProfileScreen({route, navigation}){
 
     React.useEffect(() => {
         if (route.params?.from_img_select_pic){
-        
             setPic(route.params?.from_img_select_pic)
         }
     }, [route.params?.from_img_select_pic]);
@@ -172,7 +198,7 @@ export default function ProfileScreen({route, navigation}){
 
     return (
         <View style={styles.main_container}>
-            <View style={styles.save_cancel_container}>
+            {/* <View style={styles.save_cancel_container}>
                 {
                     changes == true?  (
                         <TextButton style={styles.topLeftButton} title={"cancel"} onPress={()=>{cancel_me()}}/>
@@ -185,7 +211,7 @@ export default function ProfileScreen({route, navigation}){
                     ) : (<View/>)
                 }
                 
-            </View>
+            </View> */}
 
             <View style={styles.title_container}>
                 

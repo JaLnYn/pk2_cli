@@ -3,7 +3,7 @@ import * as React from 'react'
 
 export default function Input(props){
     return (
-        <TextInput {...props} style={[props.style, styles.input]}/>
+        <TextInput {...props} style={[styles.input,props.style]}/>
     )
 }
 

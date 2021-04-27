@@ -5,7 +5,7 @@ import default_styles from '../style/default_styles'
 
 export default function TextButton(props){
     return (
-        <TouchableOpacity style={[props.style, styles.button]} onPress={props.onPress}>
+        <TouchableOpacity style={[props.style, styles.button]} onPress={props.onPress} hitSlop={{top: 20, bottom: 20, left: 50, right: 50}}>
             <Text style={styles.text} >
                 {props.title.toUpperCase()}
             </Text>
@@ -20,6 +20,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius:8,
+        padding: 0
     },
     text: {
         color: 'purple',

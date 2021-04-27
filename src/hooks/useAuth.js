@@ -32,7 +32,7 @@ export default function useAuth() {
                             }
                         }
                     `,
-                    "variables": {"email": email, "password": password}
+                    "variables": {"email": email.toLowerCase(), "password": password}
                 });   
             } catch (err) {
                 if (!err.response){
@@ -155,18 +155,23 @@ export default function useAuth() {
                 }
                 if (resp.data.data.checkAuth == true) {
                         // works set user
+                    console.log("token works")
                     setUser(got_user)
                     return got_user
                 }else {
+                    console.log("token doesn't work")
                     // the saved user no longer works and we need to re-login
                     // check for saved sign in.
-                    let credentials = await Keychain.getGenericPassword();
+                    // let credentials = await Keychain.getGenericPassword();
+                    let credentials = null; 
                     try {
                         // Retrieve the credentials
                         credentials = await Keychain.getGenericPassword();
                     } catch (error) {
                         console.log("Keychain couldn't be accessed!", error);
                     }
+                    
+
                     if (credentials) {
                        
                         try{
@@ -183,24 +188,26 @@ export default function useAuth() {
                                             }
                                         }
                                     `,
-                                    "variables": {"email": credentials.username, "password": credentials.password}
+                                    "variables": {"email": credentials.username.toLowerCase(), "password": credentials.password}
                                 });   
                             } catch (err) {
-                                if (!error.response){
+                                if (!err.response){
                                     throw new Error("Cannot find server, please try again later")
                                 }
-                                console.log(error.response.data.errors[0].message)
+								Keychain.resetGenericPassword()
+                                console.log(err.response.data.errors[0].message)
                             }
-                            
                             // setToken(resp.data.data.login.token)
                             // setUserType(resp.data.data.login.user_type)
                             // setUserId(resp.data.data.login.userId)
+							
                             let user_stringify = JSON.stringify({
                                 token: resp.data.data.login.token,
                                 user_type: resp.data.data.login.user_type,
                                 userId: resp.data.data.login.userId,
                                 tokenExpiration: resp.data.data.login.tokenExpiration
                             })
+							
                             setUser(user_stringify)
 
                             try{

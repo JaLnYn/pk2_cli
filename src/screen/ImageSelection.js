@@ -2,6 +2,7 @@ import {View, StyleSheet, Text, Image, useState} from 'react-native';
 import { HeaderBackButton } from '@react-navigation/stack';
 import ImagePicker from 'react-native-image-picker';
 
+import axios from 'axios'
 import * as React from 'react'
 import FilledButton from '../component/FilledButton';
 
@@ -13,9 +14,12 @@ import { UserContext } from '../contexts/UserContext';
 
 import sleep from '../utils/sleep';
 
+import Input from '../component/Input'
 export default function ImageSelector({route, navigation}){
 
     const [pic, setPic] = React.useState(null); 
+    const [info, setInfo] = React.useState(null); 
+    const [infoChanged, setInfoChanged] = React.useState(false); 
     const source = React.useRef(null); 
     const user = React.useContext(UserContext);
     const [loading, setLoading] = React.useState(false);
@@ -36,60 +40,109 @@ export default function ImageSelector({route, navigation}){
         }
     }, [route.params?.current_pic]);
 
-    const onbackpress = async () => {
-                        if (source.current == null){
-                            navigation.navigate(route.params?.from_screen)
-                            return
-                        }
+    React.useEffect(() => {
+		console.log(route.params)
+        if (route.params?.ptext){
+            //console.log("image picker " + route.params?.current_pic)
+            setInfo(route.params?.ptext)
+        }
+    }, [route.params?.ptext]);
 
-                        let data = new FormData();
-                        
-                        data.append('sent_to', 0);
-                        data.append('cmd', 'pp');
-                        data.append('file', source.current);
-                        setLoading(true)
-                        await sleep(1000)
+	async function my_asyncfunction() {
+		if (infoChanged == true){
+			try {
+				let resp = await axios.post( global.gql_ad, {
+					"query": `
+						mutation setPropertyPicInfo($prop_id: ID!, $order_num: Int!, $info: String!) {
+							setPropertyPicInfo(prop_id: $prop_id, order_num: $order_num, info: $info)
+						}
+					`,
+					"variables": {"prop_id": route.params?.args.prop_id, "info": info, "order_num": route.params?.args.order_num},
+				},{
+					headers: {
+						"Authorization": 'Bearer ' + JSON.parse(user).token
+					}
+				});   
+				console.log(resp.data.data.setPropertyPicInfo)
+			} catch (err) {
+				console.log(err)
+				if (!err.response){
+					console.log("Cannot find server, please try again later")
+					setLoading(false)
+					return;
+				}
+				console.log(err.response.data.errors[0].message)
+			}
+			setLoading(false)
 
-                        fetch(global.upl_ad,{
-                            method: 'post',
-                            headers: {
-                                "Authorization": 'Bearer ' + JSON.parse(user).token,
-                                'Content-Type': 'multipart/form-data',
-                            },
-                            body: data
-                        }).then(response => {
-                            console.log(response)
-                            response.text().then(function(text){
-                                console.log(text)
-                                setLoading(false)
-                                navigation.navigate(route.params?.from_screen,{
-                                    from_img_select_pic: text.split(" ")[0]
-                                })
-                            })
-                            
-                        }).catch(err => {
-                            console.log(err)
-                        })  
+		}
+	}
 
-                        
-                    }
+
+    async function onbackpress(){
+        if (route.params?.cmd == 'test'){
+            console.log("return without upload")
+            console.log(route.params?.args)
+            return
+        }
+		let j = info
+        if (source.current == null){
+			my_asyncfunction()
+			console.log(j)
+            navigation.navigate(route.params?.from_screen, {args:route.params?.args, ntext: j,})
+			
+            return
+        }
+        let data = new FormData();
+        
+        data.append('sent_to', 0);
+        data.append('cmd', route.params?.cmd);
+        data.append('args', JSON.stringify(route.params?.args));
+        data.append('file', source.current);
+        setLoading(true)
+        await sleep(1000)
+
+        fetch(global.upl_ad,{
+            method: 'post',
+            headers: {
+                "Authorization": 'Bearer ' + JSON.parse(user).token,
+                'Content-Type': 'multipart/form-data',
+            },
+            body: data
+        }).then(response => {
+            //console.log(response)
+			let parsed = null
+            response.text().then(function(text){
+                setLoading(false)
+				my_asyncfunction()
+                navigation.navigate(route.params?.from_screen,{
+                    from_img_select_pic: text.split(" ")[0],
+					args: route.params?.args,
+					ntext: info,
+                })
+            })
+            
+        }).catch(err => {
+            console.log(err)
+        })  
+
+    }
 
     React.useLayoutEffect(() => {
         navigation.setOptions({
             headerLeft: (props) => (
                 <HeaderBackButton
                     {...props}
-                    onPress={onbackpress}
+                    onPress={() => {onbackpress()}}
                 />
             ),
         });
-    }, [navigation]);
+    }, [navigation, info]);
 
     const on_press_select_image = () => {
         console.log("wow")
         ImagePicker.showImagePicker(options, (response) => {
             //console.log('Response = ', response);
-            
             if (response.didCancel) {
                 console.log('User cancelled image picker');
             } else if (response.error) {
@@ -99,35 +152,7 @@ export default function ImageSelector({route, navigation}){
             } else {
                 const nsource = { uri: response.uri , name: response.fileName, type: response.type};
                 
-                // You can also discd play the image using data:
-                // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-                // console.log(response)
-                console.log(nsource)
-                // upload image here
-
-                // let data = new FormData();
-                
-                // data.append('sent_to', 0);
-                // data.append('cmd', 'pp');
-                // data.append('file', source);
-                // setLoading(true)
-                // fetch(global.upl_ad,{
-                //     method: 'post',
-                //     headers: {
-                //         "Authorization": 'Bearer ' + JSON.parse(user).token,
-                //         'Content-Type': 'multipart/form-data',
-                //     },
-                //     body: data
-                // }).then(response => {
-                //     console.log(response)
-                //     response.text().then(function(text){
-                //         console.log(text)
-                //         setLoading(false)
-                //     })
-                    
-                // }).catch(err => {
-                //     console.log(err)
-                // })  
+                console.log(nsource) 
                //set image
                 source.current = nsource
                 setPic(nsource.uri)
@@ -157,16 +182,26 @@ export default function ImageSelector({route, navigation}){
                     />
                 )
             }
+			{
+				route.params.showInfoBox != null && route.params.showInfoBox == true ? (
+					<Input 
+						multiline={true}
+						numberOfLines={5}
+						style={styles.textBox}
+						onChangeText={(text) => {
+							if(text.length < 1028){
+								setInfo(text)	
+								setInfoChanged(true)
+							}
+						}}
+						value={info}
+					/>
+
+				) :(
+					<View/>
+				)
+			}
             <FilledButton onPress={on_press_select_image} title={"select image"}/>
-            {/* <View>
-                <ScrollView horizontal={true}>
-                    {pics.map((item, index) => {
-                        return (
-                            <View style={{height: 50, width: 50, backgroundColor: 'orange', marginBottom: 10}} />
-                        )
-                    })}
-                </ScrollView>
-            </View> */}
             <Loading loading={loading}/>
         </View>
     )
