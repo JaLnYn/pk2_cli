@@ -10,12 +10,43 @@ import sleep from '../../utils/sleep';
 
 import axios from 'axios'
 
+
+
+
 export default function Management({navigation}){
 
     const user = React.useContext(UserContext);
     const [loading, setLoading] = React.useState(false);
 	const [myProps, setMyProps] = React.useState([])
     const [deletion, setDeletion] = React.useState(false);
+	function mapMyProps(myProps){
+		
+		if (myProps != null){
+			return myProps.map((cur_property, index) => {
+				return (
+					<PropertyBox key={index} property={cur_property} onPress={() => {
+						// navigate to it's edit page
+						if (deletion == true){
+							console.log("deleting")
+						}else{
+							navigation.navigate('PropEd', {
+								from_screen: "Management",
+								prop_id: cur_property.prop_id
+							})
+
+						}
+						//console.log(index)
+					}} deleting={deletion}/>
+				)
+			})
+		}else{
+
+			return (<View/>)
+		}
+
+	}
+
+
 	let run_this = async () => {
 				setLoading(true)
 				await sleep(1000)
@@ -111,23 +142,7 @@ export default function Management({navigation}){
                     <View style={{paddingHorizontal: 30}}>
                         <Text> hello </Text>
                     </View>
-					{myProps.map((cur_property, index) => {
-						return (
-							<PropertyBox key={index} property={cur_property} onPress={() => {
-								// navigate to it's edit page
-								if (deletion == true){
-									console.log("deleting")
-								}else{
-									navigation.navigate('PropEd', {
-										from_screen: "Management",
-										prop_id: cur_property.prop_id
-									})
-
-								}
-								//console.log(index)
-							}} deleting={deletion}/>
-						)
-					})}				
+					{mapMyProps(myProps)}				
                     
                 </ScrollView>
             </SafeAreaView>
@@ -138,7 +153,6 @@ export default function Management({navigation}){
             // </TouchableOpacity>           
 			}
             <TouchableOpacity activeOpacity={0.5} onPress={() => {on_tap_add()}} style={styles.TouchableOpacityStyle}  >
-
 
                 <Image source={{uri : 'https://reactnativecode.com/wp-content/uploads/2017/11/Floating_Button.png'}} 
                 style={styles.FloatingButtonStyle} />

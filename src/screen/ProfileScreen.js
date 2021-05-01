@@ -216,7 +216,6 @@ export default function ProfileScreen({route, navigation}){
             <View style={styles.title_container}>
                 
                 <TouchableOpacity style={styles.pic_box} onPress={()=>{on_tap_pic()}}>
-                    
                     {
                         
                         pic == null ? (
